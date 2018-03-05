@@ -1,10 +1,8 @@
 #!/bin/bash
 
-#pass relevant ISO 4217 currency code to program as argument
-
 GET() {
-	net=$(curl -s -I -1 https://google.com | sed -n 1p | awk '{ print $2 }')
-	if [[ $net =~ (2|3)[0-9][0-9] ]]; then
+	net_check=$(curl -s -I -1 https://google.com)
+	if [[ -n $net_check ]]; then
 		echo $(curl -s --tlsv1.2 https://blockchain.info/ticker | sed -n /$1/p \
 			| awk -F ':' '{ print $6 }' | cut -d ',' -f 1 | sed -n 's/^ //p')
 	else
@@ -23,6 +21,7 @@ QUIT() {
 	exit
 }
 
+[[ -z $1 ]] && echo -e "\tusage: $0 <currency_code>\n\texample: $0 USD" && exit;
 trap QUIT INT
 count=1
 tput civis
