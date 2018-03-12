@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
 GET() {
 	net_check=$(curl -s -I -1 https://google.com)
-	if [[ -n $net_check ]]; then
+	if [ -n "$net_check" ]; then
 		echo $(curl -s --tlsv1.2 https://blockchain.info/ticker | sed -n /$1/p \
 			| awk -F ':' '{ print $6 }' | cut -d ',' -f 1 | sed -n 's/^ //p')
 	else
@@ -12,8 +12,7 @@ GET() {
 
 PRINT() {
 	printf "%.*f" 2 $1
-	printf "%*s" 4
-	echo -en "\r"
+	printf "%*s\r" 4
 }
 
 QUIT() {
@@ -21,18 +20,18 @@ QUIT() {
 	exit
 }
 
-[[ -z $1 ]] && echo -e "\tusage: $0 <currency_code>\n\texample: $0 USD" && exit;
+[ -z "$1" ] && printf "\tusage: %s <currency_code>\n\texample: %s USD\n" $0 $0 && exit;
 trap QUIT INT
 count=1
 tput civis
 
 while true; do
-	[[ $count -eq 1 ]] \
+	[ $count -eq 1 ] \
 		&& price=$(GET $1)
-	if [[ $count -lt 60 ]]; then
-		echo -n "$1 "
+	if [ $count -lt 60 ]; then
+		printf "%s " $1
 		PRINT $price
-		((count++))
+		count=$((count+1))
 	else
 		count=1
 	fi
