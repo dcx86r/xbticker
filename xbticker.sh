@@ -3,8 +3,11 @@
 GET() {
 	net_check=$(curl -s -I -1 https://google.com)
 	if [ -n "$net_check" ]; then
-		echo $(curl -s --tlsv1.2 https://blockchain.info/ticker | sed -n /$1/p \
-			| awk -F ':' '{ print $6 }' | cut -d ',' -f 1 | sed -n 's/^ //p')
+		fiat=$1
+		export fiat
+		echo $(curl -s --tlsv1.2 https://blockchain.info/ticker |\
+			perl -MJSON -n0e 'my $json = decode_json $_;
+				print $json->{$ENV{fiat}}->{"15m"}' )
 	else
 		echo "NaN"
 	fi
